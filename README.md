@@ -1,2 +1,2 @@
-# Hello-world
-My first repository in Github
+# My-DDPM
+This is my Denoising Diffusion Probabilistic Models Learning notebook
