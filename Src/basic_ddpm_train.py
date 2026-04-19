@@ -1,6 +1,6 @@
 import torch
 import deepinv as dinv
-print(dinv.__version__)
+# print(dinv.__version__)  deepinv没有__version__这个属性
 from torchvision import datasets, transforms
 import os
 import matplotlib.pyplot as plt
@@ -21,6 +21,7 @@ transform = transforms.Compose(
 
 train_dataloader = torch.utils.data.DataLoader(
     datasets.MNIST(root="./datas", train=True, download=True, transform=transform),
+    batch_size=batch_size, # 不设置的话默认就是 1，训练速度很慢
     shuffle=True # shuffle 表示随机打乱顺序
 )
 
@@ -44,7 +45,7 @@ loss_fn = dinv.loss.MSE()
 # 设置扩散模型参数
 beta_start = 1e-4
 beta_end = 0.02
-timesteps = 1000
+timesteps = 200
 
 betas = torch.linspace(beta_start, beta_end, timesteps, device=device)
 alphas = 1.0 - betas
@@ -80,7 +81,7 @@ for epoch in tqdm(range(epochs), desc="Epoch", total=epochs):
 
         optimizer.zero_grad()
         estimate_noise = model(noised_imgs, t, type_t="timestep")  # 预测第t步的噪声
-        loss = loss_fn(estimate_noise, noise)  # 对比噪声
+        loss = loss_fn(estimate_noise, noise).mean()  # 对比噪声
         loss.backward()
         optimizer.step()
         
@@ -111,13 +112,13 @@ plt.grid(True, alpha=0.3)
 plt.tight_layout()
 
 # 保存损失曲线
-loss_curve_path = os.path.join(current_log_dir, "loss_curve.png")
+loss_curve_path = os.path.join(current_log_dir, "ddpm_loss_curve.png")
 plt.savefig(loss_curve_path, dpi=100)
 print(f"Loss curve saved to {loss_curve_path}")
 plt.close()
 
 # 保存数值日志
-log_file = os.path.join(current_log_dir, "training_log.txt")
+log_file = os.path.join(current_log_dir, "ddpm_training_log.txt")
 with open(log_file, 'w') as f:
     f.write(f"Training Configuration\n")
     f.write(f"{'='*50}\n")
