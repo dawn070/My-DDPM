@@ -3,3 +3,6 @@ checkpoints/
 
 # 排除训练日志文件夹
 ddpm_train_log/
+
+# 排除DDPM-main文件夹
+DDPM-main/
