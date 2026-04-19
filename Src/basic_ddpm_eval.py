@@ -29,9 +29,8 @@ n_samples = 10
 # 随机选3个样本 index 来展示
 selected_idx = random.sample(range(n_samples), 3)
 
-# 用来存储每200 step的结果
-save_steps = list(range(0, timesteps, 200))  # [0,200,...,800]
-save_steps.reverse()  # 因为是反向采样
+# 用来存储每200 step的结果，并确保包含 t=0
+save_steps = sorted(set(list(range(0, timesteps, 200)) + [0]), reverse=True)
 
 def eval():
     with torch.no_grad():
@@ -58,8 +57,8 @@ def eval():
                 x - (beta / torch.sqrt(1 - alpha_cumprod)) * predicted_noise
             ) + torch.sqrt(beta) * noise
 
-            # 记录中间结果
-            if t in save_steps:
+            # 记录中间结果（强制包含 t=0）
+            if t in save_steps or t == 0:
                 for idx in selected_idx:
                     results[idx].append(x[idx, 0].cpu())
 

@@ -1,0 +1,5 @@
+# 排除模型权重文件夹
+checkpoints/
+
+# 排除训练日志文件夹
+ddpm_train_log/
